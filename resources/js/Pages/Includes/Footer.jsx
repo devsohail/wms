@@ -5,15 +5,18 @@ import { Box, Typography } from '@mui/material';
 
 const Footer = () => {
   return (
-    <Box 
+    <Box
       component="footer"
       sx={{
         py: 3,
         px: 8,
         mt: 'auto',
-        ml: 8,
-        backgroundColor: (theme) => 
-          theme.palette.mode === 'light' 
+        ml: 25,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: (theme) =>
+          theme.palette.mode === 'light'
             ? theme.palette.grey[200]
             : theme.palette.grey[800],
       }}
