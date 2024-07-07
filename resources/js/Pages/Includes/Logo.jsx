@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
 
-const Logo = ({ height = 100 }) => {
+const Logo = ({ height = 60 }) => {
   return (
     <Box
       component="img"

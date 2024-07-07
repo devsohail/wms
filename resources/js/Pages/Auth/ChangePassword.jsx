@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import { Button, TextField, Box, Typography, Container, CssBaseline, Collapse, Alert } from '@mui/material';
+import { Button, TextField, Box, Typography, Container, CssBaseline, Collapse, Alert,IconButton, InputAdornment } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Logo from '../Includes/Logo';
 
 const theme = createTheme();
@@ -22,6 +24,22 @@ const ChangePassword = () => {
     });
 
     const [passwordStrength, setPasswordStrength] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+    
+    const [showNewPassword, setShowNewPassword] = useState(false);
+
+    const handleClickShowNewPassword = () => {
+        setShowNewPassword(!showNewPassword);
+    };
+    const [showRePassword, setShowRePassword] = useState(false);
+
+    const handleClickShowRePassword = () => {
+        setShowRePassword(!showRePassword);
+    };
 
     const validateForm = () => {
         let isValid = true;
@@ -68,7 +86,9 @@ const ChangePassword = () => {
             },
         });
     };
-
+    const handleClickCancel = () =>{
+        window.location.href = route('dashboard');
+    };
     const handlePasswordChange = (e) => {
         const { name, value } = e.target;
         setData(name, value);
@@ -108,13 +128,26 @@ const ChangePassword = () => {
                                 fullWidth
                                 name="current_password"
                                 label="Current Password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 id="current_password"
                                 autoComplete="current-password"
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 error={!!errors.current_password || !!customErrors.current_password}
                                 helperText={errors.current_password || customErrors.current_password}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                             <TextField
                                 margin="normal"
@@ -122,13 +155,26 @@ const ChangePassword = () => {
                                 fullWidth
                                 name="new_password"
                                 label="New Password"
-                                type="password"
+                                type={showNewPassword ? 'text' : 'password'}
                                 id="new_password"
                                 autoComplete="new-password"
                                 value={data.new_password}
                                 onChange={handlePasswordChange}
                                 error={!!errors.new_password || !!customErrors.new_password}
                                 helperText={errors.new_password || customErrors.new_password}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowNewPassword}
+                                                edge="end"
+                                            >
+                                                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                             <Collapse in={passwordStrength !== ''}>
                                 <Alert severity={passwordStrength === 'Strong password' ? 'success' : 'warning'}>
@@ -141,22 +187,44 @@ const ChangePassword = () => {
                                 fullWidth
                                 name="new_password_confirmation"
                                 label="Confirm New Password"
-                                type="password"
+                                type={showRePassword ? 'text' : 'password'}
                                 id="new_password_confirmation"
                                 autoComplete="new-password-confirmation"
                                 value={data.new_password_confirmation}
                                 onChange={(e) => setData('new_password_confirmation', e.target.value)}
                                 error={!!errors.new_password_confirmation || !!customErrors.new_password_confirmation}
                                 helperText={errors.new_password_confirmation || customErrors.new_password_confirmation}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowRePassword}
+                                                edge="end"
+                                            >
+                                                {showRePassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                             <Button
                                 type="submit"
-                                fullWidth
                                 variant="contained"
+                                color='success'
                                 sx={{ mt: 3, mb: 2 }}
                                 disabled={processing}
                             >
                                 Change Password
+                            </Button>
+                             <Button
+                                type="button"
+                                color='warning'
+                                onClick={handleClickCancel}
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 ,ml:2}}
+                            >
+                                Cancel
                             </Button>
                         </Box>
                     </Box>

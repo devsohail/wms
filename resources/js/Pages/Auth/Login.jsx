@@ -1,24 +1,16 @@
 // File: resources/js/Pages/Auth/Login.jsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+import { Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Paper, Box, Grid, Typography, IconButton, InputAdornment } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Logo from '../Includes/Logo';
 
-
 const theme = createTheme();
+
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -31,6 +23,7 @@ function Copyright(props) {
         </Typography>
     );
 }
+
 const Login = () => {
     const { data, setData, post, errors, processing } = useForm({
         email: '',
@@ -38,19 +31,33 @@ const Login = () => {
     });
 
     const { isAuthenticated, login } = useAuth();
+    const [showPassword, setShowPassword] = useState(false);
+    const [attempts, setAttempts] = useState(0);
 
     if (isAuthenticated) {
         window.location.href = route('dashboard');
     }
 
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (attempts >= 3) {
+            alert('You have exceeded the maximum number of login attempts. Please try again later.');
+            return;
+        }
+
         post(route('login'), {
             onSuccess: (page) => {
                 const user = page.props.auth.user;
                 login(user);
                 window.location.href = route('dashboard'); // Redirect after login
             },
+            onError: () => {
+                setAttempts(attempts + 1);
+            }
         });
     };
 
@@ -66,8 +73,7 @@ const Login = () => {
                         sm={4}
                         md={7}
                         sx={{
-                            backgroundImage:
-                                'url("/images/wareshouse.jpg")',
+                            backgroundImage: 'url("/images/wareshouse.jpg")',
                             backgroundColor: (t) =>
                                 t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
                             backgroundSize: 'cover',
@@ -84,7 +90,7 @@ const Login = () => {
                                 alignItems: 'center',
                             }}
                         >
-                            <Logo/>
+                            <Logo />
                             <Typography component="h1" variant="h5">
                                 Sign in
                             </Typography>
@@ -98,6 +104,10 @@ const Login = () => {
                                     name="email"
                                     autoComplete="email"
                                     autoFocus
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    error={!!errors.email}
+                                    helperText={errors.email}
                                 />
                                 <TextField
                                     margin="normal"
@@ -105,9 +115,26 @@ const Login = () => {
                                     fullWidth
                                     name="password"
                                     label="Password"
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     id="password"
                                     autoComplete="current-password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    error={!!errors.password}
+                                    helperText={errors.password}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                 />
                                 <FormControlLabel
                                     control={<Checkbox value="remember" color="primary" />}
@@ -118,6 +145,7 @@ const Login = () => {
                                     fullWidth
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
+                                    disabled={processing}
                                 >
                                     Sign In
                                 </Button>
@@ -125,11 +153,6 @@ const Login = () => {
                                     <Grid item xs>
                                         <Link href="#" variant="body2">
                                             Forgot password?
-                                        </Link>
-                                    </Grid>
-                                    <Grid item>
-                                        <Link href="#" variant="body2">
-                                            {"Don't have an account? Sign Up"}
                                         </Link>
                                     </Grid>
                                 </Grid>

@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import OrdersIcon from '@mui/icons-material/Receipt';
 import ReportsIcon from '@mui/icons-material/Assessment';
+import UsersIcon from '@mui/icons-material/Person';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
@@ -48,6 +49,15 @@ const LeftMenu = () => {
       subItems: [
         { text: 'Sales Reports', link: '/reports/sales' },
         { text: 'Inventory Reports', link: '/reports/inventory' }
+      ]
+    },
+    { 
+      text: 'Users', 
+      icon: <UsersIcon />, 
+      link: '#',
+      subItems: [
+        { text: 'System Users', link: '/users' },
+        { text: 'Customers', link: '/users/customers' }
       ]
     },
   ];
