@@ -25,3 +25,11 @@ deployment:
 
     - name: Clear and cache Laravel views
       command: /usr/local/bin/php /home/go4green/wms.go4green.ae/artisan view:cache
+
+    - name: Clear and cache Laravel events
+      command: /usr/local/bin/php /home/go4green/wms.go4green.ae/artisan event:cache
+
+    - name: Clear and cache Laravel translations
+      command: /usr/local/bin/php /home/go4green/wms.go4green.ae/artisan lang:cache
+
+    - name: Clear and cache Laravel commands
