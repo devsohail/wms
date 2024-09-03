@@ -1,0 +1,27 @@
+---
+deployment:
+  tasks:
+    - name: Install PHP dependencies
+      command: /usr/local/bin/php /home/go4green/wms.go4green.ae/composer install --no-dev --prefer-dist --optimize-autoloader
+
+    - name: Install Node dependencies
+      command: /usr/local/bin/npm install --prefix /home/go4green/wms.go4green.ae
+
+    - name: Build React app
+      command: /usr/local/bin/npm run build --prefix /home/go4green/wms.go4green.ae
+
+    - name: Set correct file and folder permissions
+      command: |
+        find /home/go4green/wms.go4green.ae/storage -type d -exec chmod 775 {} \;
+        find /home/go4green/wms.go4green.ae/storage -type f -exec chmod 664 {} \;
+        find /home/go4green/wms.go4green.ae/bootstrap/cache -type d -exec chmod 775 {} \;
+        find /home/go4green/wms.go4green.ae/bootstrap/cache -type f -exec chmod 664 {} \;
+
+    - name: Clear and cache Laravel configuration
+      command: /usr/local/bin/php /home/go4green/wms.go4green.ae/artisan config:cache
+
+    - name: Clear and cache Laravel routes
+      command: /usr/local/bin/php /home/go4green/wms.go4green.ae/artisan route:cache
+
+    - name: Clear and cache Laravel views
+      command: /usr/local/bin/php /home/go4green/wms.go4green.ae/artisan view:cache
