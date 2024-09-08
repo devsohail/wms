@@ -24,7 +24,7 @@ function Copyright(props) {
     );
 }
 
-const Login = () => {
+const Login = ({ successMessage }) => {
     const { data, setData, post, errors, processing } = useForm({
         email: '',
         password: '',
@@ -94,6 +94,13 @@ const Login = () => {
                             <Typography component="h1" variant="h5">
                                 Sign in
                             </Typography>
+                            {successMessage && (
+                                <Box sx={{ mt: 2, width: '100%' }}>
+                                    <Typography color="success.main" align="center">
+                                        {successMessage}
+                                    </Typography>
+                                </Box>
+                            )}
                             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                                 <TextField
                                     margin="normal"

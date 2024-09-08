@@ -9,7 +9,8 @@ import ReportsIcon from '@mui/icons-material/Assessment';
 import UsersIcon from '@mui/icons-material/Person';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-
+import { router } from '@inertiajs/react';
+import LogoutIcon from '@mui/icons-material/Logout';
 const LeftMenu = () => {
   const [open, setOpen] = useState({});
 
@@ -60,6 +61,12 @@ const LeftMenu = () => {
         { text: 'Customers', link: '/users/customers' }
       ]
     },
+    {
+      text: 'Logout',
+      icon: <LogoutIcon />,
+      onClick: () => router.post(route('logout')),
+      subItems: []
+    },
   ];
 
   return (
@@ -75,7 +82,12 @@ const LeftMenu = () => {
       <List>
         {menuItems.map((item, index) => (
           <div key={index}>
-            <ListItem button onClick={() => handleClick(index)}>
+            <ListItem
+              button
+              onClick={item.onClick ? item.onClick : () => handleClick(index)}
+              component={item.link !== '#' ? 'a' : 'div'}
+              href={item.link !== '#' ? item.link : undefined}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
               {item.subItems.length > 0 ? open[index] ? <ExpandLess /> : <ExpandMore /> : null}

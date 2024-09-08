@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+
+
 
 
 class LoginController extends Controller
@@ -28,22 +33,49 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
+        // Check if the user exists
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+        if (!$user) {
+            Log::info('Login attempt: User not found', ['email' => $credentials['email']]);
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->onlyInput('email');
+        }
+
+        // Check if the password is correct
+        if (!Hash::check($credentials['password'], $user->password)) {
+            Log::info('Login attempt: Incorrect password', ['email' => $credentials['email']]);
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('dashboard');
         }
 
+        Log::error('Login attempt: Auth::attempt failed unexpectedly', ['email' => $credentials['email']]);
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'An unexpected error occurred. Please try again.',
         ])->onlyInput('email');
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/');
+        $guard = Auth::guard();
+        
+        if (method_exists($guard, 'logout')) {
+            $guard->logout();
+        }
+        
+        if ($guard->check()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+        
+        return redirect('/')->with('success', 'You have been logged out successfully!');
+
     }
 
     public function showForgotPasswordForm()
