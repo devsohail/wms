@@ -1,19 +1,7 @@
-// import { defineConfig } from 'vite'
-// import laravel from 'laravel-vite-plugin';
-// import react from '@vitejs/plugin-react'
-
-// export default defineConfig({
-//   plugins: [
-//     laravel({
-//         input: 'resources/js/app.jsx',
-//         refresh: true,
-//     }),
-//     react()],
-// })
-
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
+import path from 'path';  // Add this import
 
 export default defineConfig({
   plugins: [
@@ -25,16 +13,13 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Add aliases if needed
-      '@': '/resources/js',
+      '@': path.resolve(__dirname, './resources/js'),  // Update this line
     },
   },
   build: {
     rollupOptions: {
-      // Exclude certain modules from the bundle
       external: ['formik'],
     },
-    // Ensure Vite correctly processes external dependencies
     commonjsOptions: {
       include: /node_modules/,
     },

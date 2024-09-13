@@ -1,7 +1,7 @@
 // File: resources/js/components/LeftMenu.jsx
 
 import React, { useState } from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Collapse } from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Collapse, Button } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import OrdersIcon from '@mui/icons-material/Receipt';
@@ -9,13 +9,20 @@ import ReportsIcon from '@mui/icons-material/Assessment';
 import UsersIcon from '@mui/icons-material/Person';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { router } from '@inertiajs/react';
+import { Link, usePage, useForm } from '@inertiajs/react';
 import LogoutIcon from '@mui/icons-material/Logout';
+
 const LeftMenu = () => {
   const [open, setOpen] = useState({});
+  const { url } = usePage();
+  const { post } = useForm();
 
   const handleClick = (index) => {
     setOpen((prevOpen) => ({ ...prevOpen, [index]: !prevOpen[index] }));
+  };
+
+  const handleLogout = () => {
+    post(route('logout'));
   };
 
   const menuItems = [
@@ -55,19 +62,20 @@ const LeftMenu = () => {
     { 
       text: 'Users', 
       icon: <UsersIcon />, 
-      link: '#',
-      subItems: [
-        { text: 'System Users', link: '/users' },
-        { text: 'Customers', link: '/users/customers' }
-      ]
+      link: '/users',
+      subItems: []
     },
     {
       text: 'Logout',
       icon: <LogoutIcon />,
-      onClick: () => router.post(route('logout')),
+      action: handleLogout,
       subItems: []
     },
   ];
+
+  const isActive = (itemLink) => {
+    return url.startsWith(itemLink) && itemLink !== '#';
+  };
 
   return (
     <Drawer
@@ -82,21 +90,47 @@ const LeftMenu = () => {
       <List>
         {menuItems.map((item, index) => (
           <div key={index}>
-            <ListItem
-              button
-              onClick={item.onClick ? item.onClick : () => handleClick(index)}
-              component={item.link !== '#' ? 'a' : 'div'}
-              href={item.link !== '#' ? item.link : undefined}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-              {item.subItems.length > 0 ? open[index] ? <ExpandLess /> : <ExpandMore /> : null}
-            </ListItem>
+            {item.action ? (
+              <ListItem
+                button
+                onClick={item.action}
+                sx={{
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ) : (
+              <ListItem
+                button
+                component={Link}
+                href={item.link}
+                method={item.method || 'get'}
+                onClick={item.subItems.length > 0 ? () => handleClick(index) : undefined}
+                sx={{
+                  backgroundColor: isActive(item.link) ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+                {item.subItems.length > 0 ? open[index] ? <ExpandLess /> : <ExpandMore /> : null}
+              </ListItem>
+            )}
             {item.subItems.length > 0 && (
               <Collapse in={open[index]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   {item.subItems.map((subItem, subIndex) => (
-                    <ListItem button key={subIndex} component="a" href={subItem.link} sx={{ pl: 4 }}>
+                    <ListItem
+                      button
+                      key={subIndex}
+                      component={Link}
+                      href={subItem.link}
+                      sx={{
+                        pl: 4,
+                        backgroundColor: isActive(subItem.link) ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                      }}
+                    >
                       <ListItemText primary={subItem.text} />
                     </ListItem>
                   ))}
