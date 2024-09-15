@@ -11,6 +11,9 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Link, usePage, useForm } from '@inertiajs/react';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PeopleIcon from '@mui/icons-material/People';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import JobIcon from '@mui/icons-material/Work';
 
 const LeftMenu = () => {
   const [open, setOpen] = useState({});
@@ -33,31 +36,10 @@ const LeftMenu = () => {
       subItems: [] 
     },
     { 
-      text: 'Inventory', 
-      icon: <InventoryIcon />, 
-      link: '#',
-      subItems: [
-        { text: 'Add Inventory', link: '/inventory/add' },
-        { text: 'View Inventory', link: '/inventory/view' }
-      ]
-    },
-    { 
-      text: 'Orders', 
-      icon: <OrdersIcon />, 
-      link: '#',
-      subItems: [
-        { text: 'New Orders', link: '/orders/new' },
-        { text: 'Order History', link: '/orders/history' }
-      ]
-    },
-    { 
-      text: 'Reports', 
-      icon: <ReportsIcon />, 
-      link: '#',
-      subItems: [
-        { text: 'Sales Reports', link: '/reports/sales' },
-        { text: 'Inventory Reports', link: '/reports/inventory' }
-      ]
+      text: 'Jobs', 
+      icon: <JobIcon />, 
+      link: '/jobs',
+      subItems: []
     },
     { 
       text: 'Users', 
@@ -65,12 +47,30 @@ const LeftMenu = () => {
       link: '/users',
       subItems: []
     },
+    { 
+      text: 'Staff', 
+      icon: <UsersIcon />, 
+      link: '/staff',
+      subItems: []
+    },
+    { 
+      text: 'Customers', 
+      icon: <PeopleIcon />, 
+      link: '/customers',
+      subItems: []
+    },
+    { 
+      text: 'Vehicles', 
+      icon: <DirectionsCarIcon />, 
+      link: '/vehicles',
+      subItems: []
+    },
     {
       text: 'Logout',
       icon: <LogoutIcon />,
       action: handleLogout,
       subItems: []
-    },
+    }
   ];
 
   const isActive = (itemLink) => {

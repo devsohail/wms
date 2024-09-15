@@ -3,6 +3,10 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -25,6 +29,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/reset-password', [LoginController::class, 'resetPassword'])->name('password.update');
     Route::get('/change-password', [LoginController::class, 'showChangePasswordForm'])->name('password.change');
     Route::post('/change-password', [LoginController::class, 'changePassword'])->name('password.change.update');
-    
     Route::resource('users', UserController::class)->only(['index', 'update', 'destroy', 'show', 'store', 'create', 'edit']);
+    Route::resource('customers', CustomerController::class);
+    Route::resource('vehicles', VehicleController::class);
+    Route::resource('jobs', JobController::class);
+    Route::post('jobs/{job}/finalize', [JobController::class, 'finalize'])->name('jobs.finalize');
+    Route::resource('staff', StaffController::class)->middleware(['auth', 'verified']);
 });
