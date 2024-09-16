@@ -13,21 +13,21 @@ class StaffController extends Controller
 {
     public function index()
     {
-        $this->authorize('viewAny', Staff::class);
+        // $this->authorize('viewAny', Staff::class);
         $staff = Staff::with('role')->get();
         return Inertia::render('Staff/Index', ['staff' => $staff]);
     }
 
     public function create()
     {
-        $this->authorize('create', Staff::class);
+        // $this->authorize('create', Staff::class);
         $roles = Role::where('id', '<>', 1)->get();
         return Inertia::render('Staff/Create', ['roles' => $roles]);
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', Staff::class);
+        // $this->authorize('create', Staff::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -53,7 +53,7 @@ class StaffController extends Controller
 
     public function edit(Staff $staff)
     {
-        $this->authorize('update', $staff);
+        // $this->authorize('update', $staff);
         $roles = Role::where('id', '<>', 1)->get();
         return Inertia::render('Staff/Edit', [
             'staff' => $staff,
@@ -63,7 +63,7 @@ class StaffController extends Controller
 
     public function update(Request $request, Staff $staff)
     {
-        $this->authorize('update', $staff);
+        // $this->authorize('update', $staff);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -87,7 +87,7 @@ class StaffController extends Controller
 
     public function destroy(Staff $staff)
     {
-        $this->authorize('delete', $staff);
+        // $this->authorize('delete', $staff);
         
         if ($staff->user) {
             $staff->user->delete();

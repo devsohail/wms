@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('license_plate')->unique();
             $table->string('status')->default('available');
             $table->string('type');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
