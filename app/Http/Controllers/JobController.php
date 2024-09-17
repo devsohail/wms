@@ -82,7 +82,6 @@ class JobController extends Controller
 
     public function edit(Job $job)
     {
-        $this->authorize('update', $job);
         $vehicles = Vehicle::all();
         $labourers = Staff::whereHas('role', function($query) {
             $query->where('name', 'labour');

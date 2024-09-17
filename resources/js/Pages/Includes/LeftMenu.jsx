@@ -14,6 +14,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import JobIcon from '@mui/icons-material/Work';
+import RoleIcon from '@mui/icons-material/Security';
 
 const LeftMenu = () => {
   const [open, setOpen] = useState({});
@@ -60,6 +61,11 @@ const LeftMenu = () => {
       subItems: []
     },
     { 
+      text: 'Roles', 
+      icon: <RoleIcon />, 
+      link: '/roles',
+      subItems: []
+    },{ 
       text: 'Vehicles', 
       icon: <DirectionsCarIcon />, 
       link: '/vehicles',

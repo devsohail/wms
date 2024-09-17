@@ -43,8 +43,12 @@ const Create = ({ vehicles, labourers, lifters, customers }) => {
   };
 
   const handleContractorTypeChange = (e) => {
-    setData('contractor_type', e.target.value);
-    setData('contractor_id', '');
+    const newContractorType = e.target.value;
+    setData(prevData => ({
+      ...prevData,
+      contractor_type: newContractorType,
+      contractor_id: '', // Reset contractor_id when type changes
+    }));
   };
 
   return (

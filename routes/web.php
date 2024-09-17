@@ -9,6 +9,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\RoleController;
 
 // Public routes
 Route::get('/', function () {
@@ -35,4 +36,5 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('jobs', JobController::class);
     Route::post('jobs/{job}/finalize', [JobController::class, 'finalize'])->name('jobs.finalize');
     Route::resource('staff', StaffController::class)->middleware(['auth', 'verified']);
+    Route::resource('roles', RoleController::class)->middleware(['auth', 'verified']);
 });
