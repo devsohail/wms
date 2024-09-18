@@ -15,7 +15,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import JobIcon from '@mui/icons-material/Work';
 import RoleIcon from '@mui/icons-material/Security';
-
+import BankIcon from '@mui/icons-material/AccountBalance';
 const LeftMenu = () => {
   const [open, setOpen] = useState({});
   const { url } = usePage();
@@ -65,10 +65,17 @@ const LeftMenu = () => {
       icon: <RoleIcon />, 
       link: '/roles',
       subItems: []
-    },{ 
+    },
+    { 
       text: 'Vehicles', 
       icon: <DirectionsCarIcon />, 
       link: '/vehicles',
+      subItems: []
+    },
+    { 
+      text: 'Banks', 
+      icon: <BankIcon />, 
+      link: '/banks',
       subItems: []
     },
     {

@@ -10,7 +10,7 @@ use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\RoleController;
-
+use App\Http\Controllers\BankController;
 // Public routes
 Route::get('/', function () {
     return Inertia::render('Auth/Login');
@@ -37,4 +37,5 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('jobs/{job}/finalize', [JobController::class, 'finalize'])->name('jobs.finalize');
     Route::resource('staff', StaffController::class)->middleware(['auth', 'verified']);
     Route::resource('roles', RoleController::class)->middleware(['auth', 'verified']);
+    Route::resource('banks', BankController::class)->middleware(['auth', 'verified']);
 });
