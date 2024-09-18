@@ -12,26 +12,42 @@ class AddNewFieldsToCustomersTable extends Migration
      */
     public function up(): void
     {
-        // First, add the new columns without constraints
         Schema::table('customers', function (Blueprint $table) {
-            $table->string('code', 4)->nullable()->after('id');
-            $table->unsignedBigInteger('sales_agent_id')->nullable()->after('code');            
-            // Ship to party details
-            $table->string('ship_to_name')->nullable();
-            $table->string('ship_to_email')->nullable();
-            $table->string('ship_to_phone')->nullable();
-            $table->text('ship_to_address')->nullable();
+            if (!Schema::hasColumn('customers', 'code')) {
+                $table->string('code', 4)->nullable()->after('id');
+            }
+            if (!Schema::hasColumn('customers', 'sales_agent_id')) {
+                $table->unsignedBigInteger('sales_agent_id')->nullable()->after('code');
+            }
+            if (!Schema::hasColumn('customers', 'ship_to_name')) {
+                $table->string('ship_to_name')->nullable();
+            }
+            if (!Schema::hasColumn('customers', 'ship_to_email')) {
+                $table->string('ship_to_email')->nullable();
+            }
+            if (!Schema::hasColumn('customers', 'ship_to_phone')) {
+                $table->string('ship_to_phone')->nullable();
+            }
+            if (!Schema::hasColumn('customers', 'ship_to_address')) {
+                $table->text('ship_to_address')->nullable();
+            }
             
-            $table->softDeletes();
+            if (!Schema::hasColumn('customers', 'deleted_at')) {
+                $table->softDeletes();
+            }
         });
 
-        // Handle existing data
-        $this->handleExistingData();
+        // Handle existing data only if the 'code' column was just added
+        if (Schema::hasColumn('customers', 'code') && DB::table('customers')->whereNull('code')->exists()) {
+            $this->handleExistingData();
+        }
 
-        // Now add constraints
-        Schema::table('customers', function (Blueprint $table) {
-            $table->string('code', 4)->unique()->change();
-        });
+        // Add unique constraint to 'code' if it doesn't already exist
+        if (!$this->hasUniqueConstraint('customers', 'code')) {
+            Schema::table('customers', function (Blueprint $table) {
+                $table->unique('code');
+            });
+        }
     }
 
     /**
@@ -51,7 +67,7 @@ class AddNewFieldsToCustomersTable extends Migration
 
     private function handleExistingData()
     {
-        $customers = DB::table('customers')->get();
+        $customers = DB::table('customers')->whereNull('code')->get();
         $defaultStaffId = DB::table('staff')->value('id');
 
         foreach ($customers as $customer) {
@@ -76,5 +92,13 @@ class AddNewFieldsToCustomersTable extends Migration
             $code = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
         }
         return $code;
+    }
+
+    private function hasUniqueConstraint($table, $column)
+    {
+        return collect(DB::select("SHOW INDEXES FROM {$table}"))
+            ->where('Column_name', $column)
+            ->where('Non_unique', 0)
+            ->isNotEmpty();
     }
 }

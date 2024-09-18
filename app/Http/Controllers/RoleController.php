@@ -26,7 +26,7 @@ class RoleController extends Controller
             'name' => 'required|string|max:255|unique:roles',
             'parent_id' => 'nullable|exists:roles,id',
         ]);
-
+        $validated['guard_name'] = 'web';
         Role::create($validated);
 
         return redirect()->route('roles.index')->with('success', 'Role created successfully.');

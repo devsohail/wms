@@ -53,8 +53,13 @@ const Index = ({ jobs }) => {
                 <TableCell>{job.job_number}</TableCell>
                 <TableCell>{formatDate(job.job_date)}</TableCell>
                 <TableCell>{job.customer ? job.customer.name : 'N/A'}</TableCell>
-                <TableCell>{job.vehicle.license_plate} - {job.vehicle.make} {job.vehicle.model}</TableCell>
-                <TableCell>{job.job_nature}</TableCell>
+                <TableCell>
+                  {job.vehicle 
+                    ? `${job.vehicle.license_plate} - ${job.vehicle.make} ${job.vehicle.model}`
+                    : 'No Vehicle'
+                  }
+                </TableCell>
+                <TableCell>{job.job_nature || 'N/A'}</TableCell>
                 <TableCell>{job.is_finalized ? 'Finalized' : (job.is_draft ? 'Draft' : 'In Progress')}</TableCell>
                 <TableCell>
                   <Link href={route('jobs.edit', job.id)}>

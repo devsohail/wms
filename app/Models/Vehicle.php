@@ -10,4 +10,8 @@ class Vehicle extends Model
     use HasFactory;
 
     protected $fillable = ['make', 'model', 'year', 'license_plate', 'type'];
+    public function jobs()
+    {
+        return $this->hasMany(Job::class);
+    }
 }

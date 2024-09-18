@@ -24,4 +24,7 @@ export default defineConfig({
       include: /node_modules/,
     },
   },
+  optimizeDeps: {
+    include: ['@mui/x-date-pickers', 'dayjs'],
+  },
 });
