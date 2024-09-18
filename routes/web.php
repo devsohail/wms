@@ -39,3 +39,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class)->middleware(['auth', 'verified']);
     Route::resource('banks', BankController::class)->middleware(['auth', 'verified']);
 });
+
+Route::delete('staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('staff.forceDelete');
+Route::post('staff/{id}/restore', [StaffController::class, 'restore'])->name('staff.restore');

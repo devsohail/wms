@@ -49,7 +49,7 @@ const LeftMenu = () => {
       subItems: []
     },
     { 
-      text: 'Staff', 
+      text: 'Master Data', 
       icon: <UsersIcon />, 
       link: '/staff',
       subItems: []

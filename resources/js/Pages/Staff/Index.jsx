@@ -15,11 +15,11 @@ const Index = ({ staff }) => {
   return (
     <AuthenticatedLayout>
       <Typography variant="h4" gutterBottom>
-        Staff
+        Master Data
       </Typography>
       <Box sx={{ mb: 2 }}>
         <Link href={route('staff.create')}>
-          <Button variant="contained" color="primary">Create Staff</Button>
+          <Button variant="contained" color="primary">Create Master Data</Button>
         </Link>
       </Box>
       <TableContainer component={Paper}>
