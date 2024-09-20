@@ -9,6 +9,7 @@ use App\Models\Staff;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
@@ -92,18 +93,19 @@ class JobController extends Controller
     public function edit(Job $job)
     {
         $vehicles = Vehicle::all();
-        $labourers = Staff::whereHas('role', function($query) {
-            $query->where('name', 'labour');
+        $laborContractors = Staff::whereHas('role', function($query) {
+            $query->where('name', 'Labour');
         })->get();
         $lifters = Staff::whereHas('role', function($query) {
-            $query->where('name', 'lifter');
+            $query->where('name', 'Lifter');
         })->get();
         $customers = Customer::all();
-
+        $laborContractor = Staff::find($job->labor_contractor_id);
+        $lifter = Staff::find($job->lifter_contractor_id);
         return Inertia::render('Jobs/Edit', [
-            'job' => $job->load('vehicle', 'labourContractor', 'lifterContractor', 'labour'),
+            'job' => $job->load('customer', 'vehicle', 'laborContractor', 'lifter'),
             'vehicles' => $vehicles,
-            'labourers' => $labourers,
+            'laborContractors' => $laborContractors,
             'lifters' => $lifters,
             'customers' => $customers,
         ]);
@@ -111,38 +113,29 @@ class JobController extends Controller
 
     public function update(Request $request, Job $job)
     {
-        
         $validated = $request->validate([
-            'job_number' => 'required|string|unique:jobs,job_number,' . $job->id,
+            'customer_id' => 'required|exists:customers,id',
+            'job_number' => 'required|unique:jobs,job_number,' . $job->id,
             'job_date' => 'required|date',
-            'job_nature' => 'required|string',
-            'client_name' => 'required',
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'ctrn_number' => 'nullable|string',
-            'seal_number' => 'nullable|string',
-            'storage_price' => 'required|numeric',
-            'storage_rate' => 'required|numeric',
-            'handling_in_price' => 'required|numeric',
-            'labour_contractor_id' => 'nullable|exists:users,id',
-            'lifter_contractor_id' => 'nullable|exists:users,id',
-            'repacking' => 'boolean',
-            'comment' => 'nullable|string',
-            'remarks' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-            'commodity' => 'nullable|string',
-            'handling_out_charges' => 'nullable|numeric',
-            'authorized_gate_pass_name' => 'nullable|string',
-            'paid_amount' => 'nullable|numeric',
-            'labour_id' => 'nullable|exists:users,id',
-            'material_used' => 'nullable|string',
-            'payment' => 'nullable|string',
-            'storage_in_job_number' => 'nullable|string',
+            'vehicle_id' => 'nullable|exists:vehicles,id',
+            'commodity' => 'nullable|string|max:255',
+            'cntr_seal_no' => 'nullable|string|max:255',
+            'weight_slip_no' => 'nullable|string|max:255',
+            'storage_type' => ['required', Rule::in(['in', 'out'])],
+            'supervisor_sign' => 'nullable|string|max:255',
+            'vehicle_in' => 'nullable|date_format:H:i',
+            'vehicle_out' => 'nullable|date_format:H:i',
+            'bags_cartons' => 'nullable|integer|min:0',
+            'pallets' => 'nullable|integer|min:0',
+            'labor_contractor_id' => 'nullable|exists:staff,id',
+            'labors_count' => 'nullable|integer|min:0',
+            'labor_start_time' => 'nullable|date_format:H:i',
+            'labor_end_time' => 'nullable|date_format:H:i',
+            'lifter_id' => 'nullable|exists:staff,id',
+            'lifter_start_time' => 'nullable|date_format:H:i',
+            'lifter_end_time' => 'nullable|date_format:H:i',
             'is_draft' => 'boolean',
         ]);
-
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('job_images', 'public');
-        }
 
         $job->update($validated);
 

@@ -1,356 +1,339 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from '@inertiajs/react';
-import { TextField, Button, Typography, Box, Checkbox, FormControlLabel, Select, MenuItem, InputLabel, FormControl, Grid, Radio, RadioGroup } from '@mui/material';
+import { Link, useForm } from '@inertiajs/react';
+import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography, Box, Grid, FormHelperText, RadioGroup, FormControlLabel, Radio, Checkbox } from '@mui/material';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import dayjs from 'dayjs';
 
-const Edit = ({ job, vehicles, labourers, lifters, customers }) => {
-  const [contractorType, setContractorType] = useState(job.contractor_type || 'labour');
-
+const Edit = ({ job, customers, vehicles, laborContractors, lifters }) => {
   const { data, setData, put, processing, errors } = useForm({
+    customer_id: job.customer_id || '',
     job_number: job.job_number || '',
-    date: job.date || '',
-    job_nature: job.job_nature || '',
-    client_id: job.client_id || '',
-    vehicle_id: job.vehicle_id || '',
-    ctrn_number: job.ctrn_number || '',
-    seal_number: job.seal_number || '',
-    storage_price: job.storage_price || '',
-    storage_rate: job.storage_rate || '',
-    handling_in_price: job.handling_in_price || '',
-    contractor_type: job.contractor_type || 'labour',
-    contractor_id: job.contractor_id || '',
-    repacking: job.repacking || false,
-    comment: job.comment || '',
-    remarks: job.remarks || '',
-    image: null,
+    job_date: job.job_date || null,
     commodity: job.commodity || '',
-    handling_out_charges: job.handling_out_charges || '',
-    authorized_gate_pass_name: job.authorized_gate_pass_name || '',
-    paid_amount: job.paid_amount || '',
-    material_used: job.material_used || '',
-    payment: job.payment || '',
-    storage_in_job_number: job.storage_in_job_number || '',
-    is_draft: job.is_draft,
+    cntr_seal_no: job.cntr_seal_no || '',
+    vehicle_id: job.vehicle_id || '',
+    weight_slip_no: job.weight_slip_no || '',
+    storage_type: job.storage_type || '',
+    supervisor_sign: job.supervisor_sign || '',
+    vehicle_in: job.vehicle_in || null,
+    vehicle_out: job.vehicle_out || null,
+    bags_cartons: job.bags_cartons || '',
+    pallets: job.pallets || '',
+    labour_contractor_id: job.labour_contractor_id || '',
+    labors_count: job.labors_count || '',
+    labor_start_time: job.labor_start_time || null,
+    labor_end_time: job.labor_end_time || null,
+    lifter_contractor_id: job.lifter_contractor_id || '',
+    lifter_start_time: job.lifter_start_time || null,
+    lifter_end_time: job.lifter_end_time || null,
+    is_draft: job.is_draft || false,
   });
 
+  const [showLaborTimes, setShowLaborTimes] = useState(!!data.labour_contractor_id);
+  const [showLifterTimes, setShowLifterTimes] = useState(!!data.lifter_contractor_id);
+
   useEffect(() => {
-    setContractorType(data.contractor_type);
-  }, [data.contractor_type]);
+    setShowLaborTimes(!!data.labour_contractor_id);
+    setShowLifterTimes(!!data.lifter_contractor_id);
+  }, [data.labour_contractor_id, data.lifter_contractor_id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     put(route('jobs.update', job.id));
   };
 
-  const handleContractorTypeChange = (e) => {
-    const type = e.target.value;
-    setContractorType(type);
-    setData('contractor_type', type);
-    setData('contractor_id', ''); // Reset the contractor selection when type changes
+  const handleStorageChange = (event) => {
+    setData('storage_type', event.target.value);
+  };
+
+  const handleTimeChange = (field, value) => {
+    setData(field, value ? dayjs(value).format('HH:mm') : null);
   };
 
   return (
     <AuthenticatedLayout>
-      <Typography variant="h4" gutterBottom>
-        Edit Job
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 900 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Job Number"
-              value={data.job_number}
-              onChange={e => setData('job_number', e.target.value)}
-              error={!!errors.job_number}
-              helperText={errors.job_number}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Date"
-              type="date"
-              value={data.date}
-              onChange={e => setData('date', e.target.value)}
-              error={!!errors.date}
-              helperText={errors.date}
-              fullWidth
-              margin="normal"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Job Nature"
-              value={data.job_nature}
-              onChange={e => setData('job_nature', e.target.value)}
-              error={!!errors.job_nature}
-              helperText={errors.job_nature}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="client-label">Client Name</InputLabel>
-              <Select
-                labelId="client-label"
-                value={data.client_id}
-                onChange={e => setData('client_id', e.target.value)}
-                error={!!errors.client_id}
-              >
-                {customers.map((customer) => (
-                  <MenuItem key={customer.id} value={customer.id}>
-                    {customer.name}
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Typography variant="h4" gutterBottom>
+          Edit Job
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 900, mt: 3 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={!!errors.customer_id}>
+                <InputLabel id="customer-select-label">Customer</InputLabel>
+                <Select
+                  labelId="customer-select-label"
+                  id="customer-select"
+                  value={data.customer_id}
+                  onChange={(e) => setData('customer_id', e.target.value)}
+                  label="Customer"
+                >
+                  <MenuItem value="">
+                    <em>Select a customer</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="vehicle-label">Vehicle</InputLabel>
-              <Select
-                labelId="vehicle-label"
-                value={data.vehicle_id}
-                onChange={e => setData('vehicle_id', e.target.value)}
-                error={!!errors.vehicle_id}
-              >
-                {vehicles.map((vehicle) => (
-                  <MenuItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.license_plate} - {vehicle.make} {vehicle.model}
+                  {customers.map(customer => (
+                    <MenuItem key={customer.id} value={customer.id}>{customer.name}</MenuItem>
+                  ))}
+                </Select>
+                {errors.customer_id && <FormHelperText>{errors.customer_id}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Job Number"
+                value={data.job_number}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <DatePicker
+                label="Job Date"
+                value={data.job_date}
+                onChange={(date) => setData('job_date', date)}
+                renderInput={(params) => <TextField {...params} fullWidth error={!!errors.job_date} helperText={errors.job_date} />}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Commodity"
+                value={data.commodity}
+                onChange={e => setData('commodity', e.target.value)}
+                error={!!errors.commodity}
+                helperText={errors.commodity}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="CNTR / Seal No."
+                value={data.cntr_seal_no}
+                onChange={e => setData('cntr_seal_no', e.target.value)}
+                error={!!errors.cntr_seal_no}
+                helperText={errors.cntr_seal_no}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={!!errors.vehicle_id}>
+                <InputLabel id="vehicle-select-label">Vehicle</InputLabel>
+                <Select
+                  labelId="vehicle-select-label"
+                  id="vehicle-select"
+                  value={data.vehicle_id}
+                  onChange={(e) => setData('vehicle_id', e.target.value)}
+                  label="Vehicle"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {vehicles.map(vehicle => (
+                    <MenuItem key={vehicle.id} value={vehicle.id}>{vehicle.license_plate}</MenuItem>
+                  ))}
+                </Select>
+                {errors.vehicle_id && <FormHelperText>{errors.vehicle_id}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Weight Slip No."
+                value={data.weight_slip_no}
+                onChange={e => setData('weight_slip_no', e.target.value)}
+                error={!!errors.weight_slip_no}
+                helperText={errors.weight_slip_no}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl component="fieldset" error={!!errors.storage_type}>
+                <Typography variant="subtitle1" gutterBottom>Storage Type</Typography>
+                <RadioGroup
+                  row
+                  aria-label="storage-type"
+                  name="storage_type"
+                  value={data.storage_type}
+                  onChange={handleStorageChange}
+                >
+                  <FormControlLabel value="in" control={<Radio />} label="Storage In" />
+                  <FormControlLabel value="out" control={<Radio />} label="Storage Out" />
+                </RadioGroup>
+                {errors.storage_type && <FormHelperText>{errors.storage_type}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Supervisor Sign"
+                value={data.supervisor_sign}
+                onChange={e => setData('supervisor_sign', e.target.value)}
+                error={!!errors.supervisor_sign}
+                helperText={errors.supervisor_sign}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TimePicker
+                label="Vehicle In"
+                value={data.vehicle_in}
+                onChange={(time) => handleTimeChange('vehicle_in', time)}
+                renderInput={(params) => <TextField {...params} fullWidth error={!!errors.vehicle_in} helperText={errors.vehicle_in} />}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TimePicker
+                label="Vehicle Out"
+                value={data.vehicle_out}
+                onChange={(time) => handleTimeChange('vehicle_out', time)}
+                renderInput={(params) => <TextField {...params} fullWidth error={!!errors.vehicle_out} helperText={errors.vehicle_out} />}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Bags/Cartons"
+                type="number"
+                inputProps={{ min: 0 }}
+                value={data.bags_cartons}
+                onChange={e => setData('bags_cartons', e.target.value)}
+                error={!!errors.bags_cartons}
+                helperText={errors.bags_cartons}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Pallets"
+                type="number"
+                inputProps={{ min: 0 }}
+                value={data.pallets}
+                onChange={e => setData('pallets', e.target.value)}
+                error={!!errors.pallets}
+                helperText={errors.pallets}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={!!errors.labour_contractor_id}>
+                <InputLabel>Labor Contractor</InputLabel>
+                <Select
+                  value={data.labour_contractor_id}
+                  onChange={e => setData('labour_contractor_id', e.target.value)}
+                  label="Labor Contractor"
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {laborContractors.map(contractor => (
+                    <MenuItem key={contractor.id} value={contractor.id}>{contractor.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            {showLaborTimes && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="# of Labors"
+                    type="number"
+                    inputProps={{ min: 0 }}
+                    value={data.labors_count}
+                    onChange={e => setData('labors_count', e.target.value)}
+                    error={!!errors.labors_count}
+                    helperText={errors.labors_count}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Labor Start Time"
+                    value={data.labor_start_time ? dayjs(data.labor_start_time, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('labor_start_time', time)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.labor_start_time}
+                        helperText={errors.labor_start_time}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Labor End Time"
+                    value={data.labor_end_time ? dayjs(data.labor_end_time, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('labor_end_time', time)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.labor_end_time}
+                        helperText={errors.labor_end_time}
+                      />
+                    )}
+                  />
+                </Grid>
+              </>
+            )}
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={!!errors.lifter_contractor_id}>
+                <InputLabel>Lifter</InputLabel>
+                <Select
+                  value={data.lifter_contractor_id}
+                  onChange={e => setData('lifter_contractor_id', e.target.value)}
+                  label="Lifter"
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {lifters.map(lifter => (
+                    <MenuItem key={lifter.id} value={lifter.id}>{lifter.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            {showLifterTimes && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Lifter Start Time"
+                    value={data.lifter_start_time ? dayjs(data.lifter_start_time, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('lifter_start_time', time)}
+                    renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_start_time} helperText={errors.lifter_start_time} />}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Lifter End Time"
+                    value={data.lifter_end_time ? dayjs(data.lifter_end_time, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('lifter_end_time', time)}
+                    renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_end_time} helperText={errors.lifter_end_time} />}
+                  />
+                </Grid>
+              </>
+            )}
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={data.is_draft}
+                    onChange={(e) => setData('is_draft', e.target.checked)}
+                    name="is_draft"
+                  />
+                }
+                label="Save as Draft"
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="CTRN Number"
-              value={data.ctrn_number}
-              onChange={e => setData('ctrn_number', e.target.value)}
-              error={!!errors.ctrn_number}
-              helperText={errors.ctrn_number}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Seal Number"
-              value={data.seal_number}
-              onChange={e => setData('seal_number', e.target.value)}
-              error={!!errors.seal_number}
-              helperText={errors.seal_number}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Storage Price"
-              type="number"
-              value={data.storage_price}
-              onChange={e => setData('storage_price', e.target.value)}
-              error={!!errors.storage_price}
-              helperText={errors.storage_price}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Storage Rate"
-              type="number"
-              value={data.storage_rate}
-              onChange={e => setData('storage_rate', e.target.value)}
-              error={!!errors.storage_rate}
-              helperText={errors.storage_rate}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Handling In Price"
-              type="number"
-              value={data.handling_in_price}
-              onChange={e => setData('handling_in_price', e.target.value)}
-              error={!!errors.handling_in_price}
-              helperText={errors.handling_in_price}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl component="fieldset">
-              <Typography variant="subtitle1">Contractor Type</Typography>
-              <RadioGroup
-                row
-                value={data.contractor_type}
-                onChange={handleContractorTypeChange}
-              >
-                <FormControlLabel value="labour" control={<Radio />} label="Labour" />
-                <FormControlLabel value="lifter" control={<Radio />} label="Lifter" />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="contractor-label">
-                {contractorType === 'labour' ? 'Labour Contractor' : 'Lifter Contractor'}
-              </InputLabel>
-              <Select
-                labelId="contractor-label"
-                value={data.contractor_id}
-                onChange={e => setData('contractor_id', e.target.value)}
-                error={!!errors.contractor_id}
-              >
-                {(contractorType === 'labour' ? labourers : lifters).map((contractor) => (
-                  <MenuItem key={contractor.id} value={contractor.id}>
-                    {contractor.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={data.repacking}
-                  onChange={e => setData('repacking', e.target.checked)}
-                />
-              }
-              label="Repacking"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Comment"
-              value={data.comment}
-              onChange={e => setData('comment', e.target.value)}
-              error={!!errors.comment}
-              helperText={errors.comment}
-              fullWidth
-              margin="normal"
-              multiline
-              rows={3}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Remarks"
-              value={data.remarks}
-              onChange={e => setData('remarks', e.target.value)}
-              error={!!errors.remarks}
-              helperText={errors.remarks}
-              fullWidth
-              margin="normal"
-              multiline
-              rows={3}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Commodity"
-              value={data.commodity}
-              onChange={e => setData('commodity', e.target.value)}
-              error={!!errors.commodity}
-              helperText={errors.commodity}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Handling Out Charges"
-              type="number"
-              value={data.handling_out_charges}
-              onChange={e => setData('handling_out_charges', e.target.value)}
-              error={!!errors.handling_out_charges}
-              helperText={errors.handling_out_charges}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Authorized Gate Pass Name"
-              value={data.authorized_gate_pass_name}
-              onChange={e => setData('authorized_gate_pass_name', e.target.value)}
-              error={!!errors.authorized_gate_pass_name}
-              helperText={errors.authorized_gate_pass_name}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Paid Amount"
-              type="number"
-              value={data.paid_amount}
-              onChange={e => setData('paid_amount', e.target.value)}
-              error={!!errors.paid_amount}
-              helperText={errors.paid_amount}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Material Used"
-              value={data.material_used}
-              onChange={e => setData('material_used', e.target.value)}
-              error={!!errors.material_used}
-              helperText={errors.material_used}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Payment"
-              value={data.payment}
-              onChange={e => setData('payment', e.target.value)}
-              error={!!errors.payment}
-              helperText={errors.payment}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Storage In Job Number"
-              value={data.storage_in_job_number}
-              onChange={e => setData('storage_in_job_number', e.target.value)}
-              error={!!errors.storage_in_job_number}
-              helperText={errors.storage_in_job_number}
-              fullWidth
-              margin="normal"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={data.is_draft}
-                  onChange={e => setData('is_draft', e.target.checked)}
-                />
-              }
-              label="Save as Draft"
-            />
-          </Grid>
-        </Grid>
-        <Box sx={{ mt: 2 }}>
-          <Button type="submit" variant="contained" color="primary" disabled={processing}>
-            Update Job
-          </Button>
+          <Box sx={{ mt: 2 }}>
+            <Button type="submit" variant="contained" color="primary" disabled={processing}>
+              {data.is_draft ? 'Save Draft' : 'Update Job'}
+            </Button>
+            <Link href={route('jobs.index')}>
+              <Button variant="outlined" sx={{ ml: 2 }}>Cancel</Button>
+            </Link>
+          </Box>
         </Box>
-      </Box>
+      </LocalizationProvider>
     </AuthenticatedLayout>
   );
 };
