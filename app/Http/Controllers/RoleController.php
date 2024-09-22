@@ -11,13 +11,18 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::with('parent')->get();
-        return Inertia::render('Roles/Index', ['roles' => $roles]);
+        return Inertia::render('Roles/Index', 
+        [
+            'roles' => $roles,
+            'flash' => session('flash')
+        ]);
     }
 
     public function create()
     {
         $roles = Role::all();
-        return Inertia::render('Roles/Create', ['roles' => $roles]);
+        return Inertia::render('Roles/Create', 
+        ['roles' => $roles]);
     }
 
     public function store(Request $request)
@@ -29,7 +34,12 @@ class RoleController extends Controller
         $validated['guard_name'] = 'web';
         Role::create($validated);
 
-        return redirect()->route('roles.index')->with('success', 'Role created successfully.');
+        return redirect()->route('roles.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record created successfully.'
+        ]);
     }
 
     public function edit(Role $role)
@@ -50,12 +60,22 @@ class RoleController extends Controller
 
         $role->update($validated);
 
-        return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
+        return redirect()->route('roles.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record updated successfully.'
+        ]);
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
-        return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
+        return redirect()->route('roles.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record deleted successfully.'
+        ]);
     }
 }

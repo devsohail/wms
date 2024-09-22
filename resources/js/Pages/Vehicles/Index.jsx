@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box } from '@mui/material';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { showSuccessToast, showErrorToast } from '@/Utils/toast';
 
-const Index = ({ vehicles }) => {
+const Index = ({ vehicles, flash }) => {
   const { delete: destroy } = useForm();
 
   const handleDelete = (id) => {
@@ -11,6 +12,14 @@ const Index = ({ vehicles }) => {
       destroy(route('vehicles.destroy', id));
     }
   };
+
+  useEffect(() => {
+    if (flash && flash.type === 'success') {
+      showSuccessToast(flash.message);
+    } else if (flash && flash.type === 'error') {
+      showErrorToast(flash.message);
+    }
+  }, [flash]);
 
   return (
     <AuthenticatedLayout>

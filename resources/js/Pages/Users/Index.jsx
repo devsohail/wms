@@ -1,13 +1,20 @@
-import React from 'react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import React, { useEffect } from 'react';
+import { Link, useForm } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box } from '@mui/material';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import UsersIcon from '@mui/icons-material/Person';
 import UserAddIcon from '@mui/icons-material/PersonAdd';
-
-const Index = ({ users, activeUsers, inactiveUsers }) => {
-  const { flash } = usePage().props;
+import { showSuccessToast, showErrorToast } from '@/Utils/toast';
+const Index = ({ users, activeUsers, inactiveUsers, flash }) => {
   const { delete: destroy } = useForm();
+
+  useEffect(() => {
+    if (flash && flash.type === 'success') {
+      showSuccessToast(flash.message);
+    } else if (flash && flash.type === 'error') {
+      showErrorToast(flash.message);
+    }
+  }, [flash]);
 
   const handleDelete = (userId) => {
     if (confirm('Are you sure you want to delete this user?')) {
@@ -20,11 +27,6 @@ const Index = ({ users, activeUsers, inactiveUsers }) => {
       <Typography variant="h4" gutterBottom>
         Users
       </Typography>
-      {flash?.success && (
-        <Box sx={{ mb: 2, p: 2, bgcolor: 'success.light', color: 'success.contrastText' }}>
-          {flash.success}
-        </Box>
-      )}
       <Box  sx={{
           width: 200,
           height: 150,

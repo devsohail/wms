@@ -11,7 +11,11 @@ class VehicleController extends Controller
     public function index()
     {
         $vehicles = Vehicle::all();
-        return Inertia::render('Vehicles/Index', ['vehicles' => $vehicles]);
+        return Inertia::render('Vehicles/Index', 
+        [
+            'vehicles' => $vehicles,
+            'flash' => session('flash')
+        ]);
     }
 
     public function create()
@@ -31,7 +35,11 @@ class VehicleController extends Controller
 
         Vehicle::create($validated);
 
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle created successfully.');
+        return redirect()->route('vehicles.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record created successfully.'
+        ]);
     }
 
     public function edit(Vehicle $vehicle)
@@ -51,12 +59,20 @@ class VehicleController extends Controller
 
         $vehicle->update($validated);
 
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle updated successfully.');
+        return redirect()->route('vehicles.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record updated successfully.'
+        ]);
     }
 
     public function destroy(Vehicle $vehicle)
     {
         $vehicle->delete();
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle deleted successfully.');
+        return redirect()->route('vehicles.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record deleted successfully.'
+        ]);
     }
 }

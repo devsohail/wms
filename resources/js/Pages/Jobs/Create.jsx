@@ -7,8 +7,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { showSuccessToast, showErrorToast } from '@/Utils/toast';
 
-const Create = ({ customers, vehicles, laborContractors, lifters }) => {
+const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
   const { data, setData, post, processing, errors } = useForm({
     customer_id: '',
     job_number: '',
@@ -37,13 +38,28 @@ const Create = ({ customers, vehicles, laborContractors, lifters }) => {
   const [showLifterTimes, setShowLifterTimes] = useState(false);
 
   useEffect(() => {
+    if (flash?.success) {
+      showSuccessToast(flash.success);
+    }
+    if (flash?.error) {
+      showErrorToast(flash.error);
+    }
     setShowLaborTimes(!!data.labour_contractor_id);
     setShowLifterTimes(!!data.lifter_contractor_id);
-  }, [data.labour_contractor_id, data.lifter_contractor_id]);
+  }, [flash, data.labour_contractor_id, data.lifter_contractor_id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(route('jobs.store'));
+    post(route('jobs.store'), {
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        showSuccessToast('Job created successfully');
+      },
+      onError: () => {
+        showErrorToast('An error occurred while creating the job');
+      },
+    });
   };
 
   const handleCustomerChange = async (e) => {

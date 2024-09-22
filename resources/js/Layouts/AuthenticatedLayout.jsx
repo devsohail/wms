@@ -2,6 +2,8 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Box, CssBaseline } from '@mui/material';
 import LeftMenu from '@/Pages/Includes/LeftMenu';
 import { usePage } from '@inertiajs/react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthenticatedLayout = ({ children }) => {
   const { auth } = usePage().props;
@@ -32,6 +34,7 @@ const AuthenticatedLayout = ({ children }) => {
       >
         {children}
       </Box>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Box>
   );
 };

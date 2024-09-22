@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useForm } from '@inertiajs/react';
-import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography, Box, Grid, Checkbox, FormControlLabel } from '@mui/material';
+import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography, Box, Grid, Checkbox, FormControlLabel, Alert } from '@mui/material';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
-const Create = ({ salesAgents, nextCode }) => {
-  const { data, setData, post, processing, errors } = useForm({
+const Create = ({ salesAgents, nextCode, flash }) => {
+  const { data, setData, post, processing, errors, reset } = useForm({
     code: nextCode,
     sales_agent_id: '',
     name: '',
@@ -15,13 +15,34 @@ const Create = ({ salesAgents, nextCode }) => {
     ship_to_email: '',
     ship_to_phone: '',
     ship_to_address: '',
+    license_file: null,
+    trn: '',
   });
 
   const [sameAsShipTo, setSameAsShipTo] = useState(false);
+  const [generalError, setGeneralError] = useState(null);
+
+  useEffect(() => {
+    if (flash?.error) {
+      showErrorToast(flash.error);
+    }
+  }, [flash]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(route('customers.store'));
+    setGeneralError(null);
+    post(route('customers.store'), {
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        reset();
+      },
+      onError: (errors) => {
+        if (errors.general) {
+          setGeneralError(errors.general);
+        }
+      },
+    });
   };
 
   const handleSameAsShipToChange = (e) => {
@@ -35,6 +56,15 @@ const Create = ({ salesAgents, nextCode }) => {
         ship_to_address: data.address,
       });
     }
+  };
+
+  const handleFileChange = (e) => {
+    setData('license_file', e.target.files[0]);
+  };
+
+  const handleTrnChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+    setData('trn', value);
   };
 
   useEffect(() => {
@@ -54,6 +84,11 @@ const Create = ({ salesAgents, nextCode }) => {
       <Typography variant="h4" gutterBottom>
         Create Customer
       </Typography>
+      {generalError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {generalError}
+        </Alert>
+      )}
       <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 900, mt: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
@@ -61,9 +96,9 @@ const Create = ({ salesAgents, nextCode }) => {
               fullWidth
               label="Customer Code"
               value={data.code}
-              InputProps={{
-                readOnly: true,
-              }}
+              onChange={e => setData('code', e.target.value)}
+              error={!!errors.code}
+              helperText={errors.code}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -185,6 +220,36 @@ const Create = ({ salesAgents, nextCode }) => {
               error={!!errors.ship_to_address}
               helperText={errors.ship_to_address}
             />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="TRN"
+              value={data.trn}
+              onChange={handleTrnChange}
+              error={!!errors.trn}
+              helperText={errors.trn}
+              inputProps={{
+                inputMode: 'numeric',
+                pattern: '[0-9]*'
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <input
+              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+              style={{ display: 'none' }}
+              id="license-file-upload"
+              type="file"
+              onChange={handleFileChange}
+            />
+            <label htmlFor="license-file-upload">
+              <Button variant="contained" component="span">
+                Upload License File
+              </Button>
+            </label>
+            {data.license_file && <Typography variant="body2">{data.license_file.name}</Typography>}
+            {errors.license_file && <Typography color="error">{errors.license_file}</Typography>}
           </Grid>
         </Grid>
         <Box sx={{ mt: 2 }}>

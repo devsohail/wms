@@ -11,7 +11,11 @@ class BankController extends Controller
     public function index()
     {
         $banks = Bank::all();
-        return Inertia::render('Banks/Index', ['banks' => $banks]);
+        return Inertia::render('Banks/Index', 
+        [
+            'banks' => $banks,
+            'flash' => session('flash')
+        ]);
     }
 
     public function create()
@@ -28,7 +32,11 @@ class BankController extends Controller
 
         Bank::create($validated);
 
-        return redirect()->route('banks.index')->with('success', 'Bank created successfully.');
+        return redirect()->route('banks.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record created successfully.'
+        ]);
     }
 
     public function edit(Bank $bank)
@@ -45,12 +53,20 @@ class BankController extends Controller
 
         $bank->update($validated);
 
-        return redirect()->route('banks.index')->with('success', 'Bank updated successfully.');
+        return redirect()->route('banks.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record updated successfully.'
+        ]);
     }
 
     public function destroy(Bank $bank)
     {
         $bank->delete();
-        return redirect()->route('banks.index')->with('success', 'Bank deleted successfully.');
+        return redirect()->route('banks.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record deleted successfully.'
+        ]);
     }
 }

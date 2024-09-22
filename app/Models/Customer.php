@@ -22,6 +22,8 @@ class Customer extends Model
         'ship_to_phone',
         'ship_to_address',
         'user_id',
+        'license_file',
+        'trn',
     ];
 
     public function salesAgent()
@@ -37,5 +39,10 @@ class Customer extends Model
     public function jobs()
     {
         return $this->hasMany(Job::class);
+    }
+
+    public function code()
+    {
+        return $this->morphOne(Code::class, 'entity');
     }
 }

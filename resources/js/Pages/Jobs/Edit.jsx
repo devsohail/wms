@@ -5,9 +5,10 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { showSuccessToast, showErrorToast } from '@/Utils/toast';
 import dayjs from 'dayjs';
 
-const Edit = ({ job, customers, vehicles, laborContractors, lifters }) => {
+const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) => {
   const { data, setData, put, processing, errors } = useForm({
     customer_id: job.customer_id || '',
     job_number: job.job_number || '',
@@ -36,13 +37,25 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters }) => {
   const [showLifterTimes, setShowLifterTimes] = useState(!!data.lifter_contractor_id);
 
   useEffect(() => {
+    if (flash?.error) {
+      showErrorToast(flash.error);
+    }
     setShowLaborTimes(!!data.labour_contractor_id);
     setShowLifterTimes(!!data.lifter_contractor_id);
   }, [data.labour_contractor_id, data.lifter_contractor_id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    put(route('jobs.update', job.id));
+    put(route('jobs.update', job.id), {
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        showSuccessToast('Job updated successfully');
+      },
+      onError: () => {
+        showErrorToast('An error occurred while updating the job');
+      },
+    });
   };
 
   const handleStorageChange = (event) => {
@@ -298,7 +311,14 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters }) => {
                     label="Lifter Start Time"
                     value={data.lifter_start_time ? dayjs(data.lifter_start_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('lifter_start_time', time)}
-                    renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_start_time} helperText={errors.lifter_start_time} />}
+                    renderInput={(params) => 
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.lifter_start_time}
+                        helperText={errors.lifter_start_time}
+                    />
+                  }
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>

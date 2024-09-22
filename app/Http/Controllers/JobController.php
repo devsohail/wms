@@ -16,7 +16,11 @@ class JobController extends Controller
     public function index()
     {
         $jobs = Job::with(['customer', 'vehicle'])->get();
-        return Inertia::render('Jobs/Index', ['jobs' => $jobs]);
+        return Inertia::render('Jobs/Index', 
+        [
+            'jobs' => $jobs,
+            'flash' => session('flash')
+        ]);
     }
 
     public function create()
@@ -87,7 +91,12 @@ class JobController extends Controller
             'user_id' => Auth::id()
         ]);
 
-        return redirect()->route('jobs.index')->with('success', 'Job created successfully.');
+        return redirect()->route('jobs.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Job created successfully.'
+        ]);
     }
 
     public function edit(Job $job)
@@ -139,21 +148,36 @@ class JobController extends Controller
 
         $job->update($validated);
 
-        return redirect()->route('jobs.index')->with('success', 'Job updated successfully.');
+        return redirect()->route('jobs.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Job updated successfully.'
+        ]);
     }
 
     public function destroy(Job $job)
     {
         // $this->authorize('delete', $job);
         $job->delete();
-        return redirect()->route('jobs.index')->with('success', 'Job deleted successfully.');
+        return redirect()->route('jobs.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Job deleted successfully.'
+        ]);
     }
 
     public function finalize(Job $job)
     {
         // $this->authorize('finalize', $job);
         $job->update(['is_finalized' => true, 'is_draft' => false]);
-        return redirect()->route('jobs.index')->with('success', 'Job finalized successfully.');
+        return redirect()->route('jobs.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Job finalized successfully.'
+        ]);
     }
 
     public function generateJobNumber($customerId)

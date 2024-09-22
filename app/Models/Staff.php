@@ -24,5 +24,9 @@ class Staff extends Model
     {
         return $this->belongsTo(Bank::class);
     }
-    
+
+    public function code()
+    {
+        return $this->morphOne(Code::class, 'entity');
+    }
 }

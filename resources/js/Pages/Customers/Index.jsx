@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box } from '@mui/material';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { showSuccessToast, showErrorToast } from '@/Utils/toast';
 
-const Index = ({ customers }) => {
+const Index = ({ customers, flash }) => {
   const { delete: destroy } = useForm();
+
+  useEffect(() => {
+    if (flash && flash.type === 'success') {
+      showSuccessToast(flash.message);
+    } else if (flash && flash.type === 'error') {
+      showErrorToast(flash.message);
+    }
+  }, [flash]);
 
   const handleDelete = (id) => {
     if (confirm('Are you sure you want to delete this customer?')) {

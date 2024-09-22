@@ -24,8 +24,7 @@ class UserController extends Controller
             'users' => $users,
             'activeUsers' => $activeUsers,
             'inactiveUsers' => $inactiveUsers,
-        ])->with('flash', [
-            'success' => session('success'),
+            'flash' => session('flash')
         ]);
     }
 
@@ -48,7 +47,11 @@ class UserController extends Controller
 
         User::create($validated);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('users.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record created successfully.'
+        ]);
     }
 
     public function edit(User $user)
@@ -74,12 +77,20 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+            return redirect()->route('users.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record updated successfully.'
+        ]);
     }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('users.index')->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Record deleted successfully.'
+        ]);
     }
 }
