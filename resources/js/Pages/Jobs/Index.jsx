@@ -4,9 +4,11 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { format, parseISO } from 'date-fns';
 import { showSuccessToast, showErrorToast } from '@/Utils/toast';
+import { jsPDF } from "jspdf";
+import 'jspdf-autotable';
 
 const Index = ({ jobs, flash }) => {
-  const { delete: destroy, post } = useForm();
+  const { post } = useForm();
 
   useEffect(() => {
     if (flash && flash.type === 'success') {
@@ -16,16 +18,65 @@ const Index = ({ jobs, flash }) => {
     }
   }, [flash]);
 
-  const handleDelete = (id) => {
-    if (confirm('Are you sure you want to delete this job?')) {
-      destroy(route('jobs.destroy', id));
-    }
-  };
-
   const handleFinalize = (id) => {
     if (confirm('Are you sure you want to finalize this job?')) {
       post(route('jobs.finalize', id));
     }
+  };
+
+  const handlePrint = (job) => {
+    const doc = new jsPDF();
+
+    // Get the base URL of your application
+    const baseUrl = window.location.origin;
+
+    // Construct the full URL to your logo image
+    const logoUrl = `${baseUrl}/images/Go4Green-logo.png`; // Adjust the path as needed
+
+    // Add logo
+    doc.addImage(logoUrl, 'PNG', 10, 10, 50, 20);
+
+    // Add customer details
+    doc.setFontSize(14);
+    doc.text('Customer Details', 14, 60);
+    doc.setFontSize(12);
+    doc.text(`Name: ${job.customer?.name || 'N/A'}`, 14, 70);
+    doc.text(`Address: ${job.customer?.address || 'N/A'}`, 14, 80);
+
+    // Add job details
+    doc.setFontSize(14);
+    doc.text('Job Details', 14, 100);
+    doc.setFontSize(12);
+    doc.autoTable({
+      startY: 110,
+      head: [['', '']],
+      body: [
+        ['Job Number', job.job_number || 'N/A'],
+        ['Date', job.job_date ? formatDate(job.job_date) : 'N/A'],
+        ['Job Nature', job.job_nature || 'N/A'],
+        ['Commodity', job.commodity || 'N/A'],
+        ['Seal Number', job.cntr_seal_no || 'N/A'],
+        ['Vehicle', job.vehicle ? `${job.vehicle.license_plate} - ${job.vehicle.make} ${job.vehicle.model}` : 'N/A'],
+        ['Vehicle In', job.vehicle_in || 'N/A'],
+        ['Vehicle Out', job.vehicle_out || 'N/A'],
+        ['Weight Slip No', job.weight_slip_no || 'N/A'],
+        ['Bags/Cartons', job.bags_cartons || 'N/A'],
+        ['Pallets', job.pallets || 'N/A'],
+        ['Supervisor Sign', job.supervisor_sign || 'N/A'],
+        ['Labor Contractor', job.labor_contractor || 'N/A'],
+        ['Labor Start Time', job.labor_start_time || 'N/A'],
+        ['Labor End Time', job.labor_end_time || 'N/A'],
+        ['Lifter Contractor', job.lifter_contractor ? job.lifter_contractor.name : 'N/A'],
+        ['Lifter Start Time', job.lifter_start_time || 'N/A'],
+        ['Lifter End Time', job.lifter_end_time || 'N/A'],
+        ['Status', job.is_finalized ? 'Finalized' : (job.is_draft ? 'Draft' : 'In Progress')],
+      ],
+      footer: function(currentPage, pageCount) {
+        return `Page ${currentPage} of ${pageCount}`;
+      }
+    });
+
+    doc.save(`job_${job.job_number || 'unknown'}.pdf`);
   };
 
   const formatDate = (dateString) => {
@@ -69,28 +120,40 @@ const Index = ({ jobs, flash }) => {
                   }
                 </TableCell>
                 <TableCell>{job.job_nature || 'N/A'}</TableCell>
-                <TableCell>{job.is_finalized ? 'Finalized' : (job.is_draft ? 'Draft' : 'In Progress')}</TableCell>
+                <TableCell>{job.is_finalized ? 'Finalized' : (job.is_draft ? 'Draft' : 'In Draft')}</TableCell>
                 <TableCell>
-                  <Link href={route('jobs.edit', job.id)}>
-                    <Button variant="outlined" color="primary" sx={{ mr: 1 }}>Edit</Button>
-                  </Link>
-                  <Button 
-                    variant="outlined" 
-                    color="secondary" 
-                    onClick={() => handleDelete(job.id)}
-                    sx={{ mr: 1 }}
-                  >
-                    Delete
-                  </Button>
-                  {!job.is_finalized && (
+                  {job.is_draft && (
+                    <Link href={route('jobs.edit', job.id)}>
+                      <Button variant="outlined" color="primary" sx={{ mr: 1 }}>Edit</Button>
+                    </Link>
+                  )}
+                  {!job.is_draft && !job.is_finalized && (
                     <Button 
                       variant="outlined" 
                       color="success" 
                       onClick={() => handleFinalize(job.id)}
+                      sx={{ mr: 1 }}
                     >
                       Finalize
                     </Button>
                   )}
+                  {job.is_finalized && (
+                    <Button 
+                      variant="outlined" 
+                      color="warning" 
+                      onClick={() => handleReopen(job.id)}
+                      sx={{ mr: 1 }}
+                    >
+                      Re-open
+                    </Button>
+                  )}
+                  <Button 
+                    variant="outlined" 
+                    color="info" 
+                    onClick={() => handlePrint(job)}
+                  >
+                    Print
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Models\JobLog;
 
 class JobController extends Controller
 {
@@ -54,8 +55,8 @@ class JobController extends Controller
             'storage_type' => 'required|in:in,out',
             'supervisor_sign' => 'nullable|string',
             'g4g_team' => 'nullable|string',
-            'vehicle_in' => 'nullable|date',
-            'vehicle_out' => 'nullable|date',
+            'vehicle_in' => 'nullable|date_format:H:i',
+            'vehicle_out' => 'nullable|date_format:H:i',
             'bags_cartons' => 'nullable|integer',
             'pallets' => 'nullable|integer',
             'labour_contractor_id' => 'nullable|exists:staff,id',
@@ -172,11 +173,34 @@ class JobController extends Controller
     {
         // $this->authorize('finalize', $job);
         $job->update(['is_finalized' => true, 'is_draft' => false]);
+        $this->logJobAction($job, 'finalized');
         return redirect()->route('jobs.index')
         ->with('flash', 
         [
             'type' => 'success',
             'message' => 'Job finalized successfully.'
+        ]);
+    }
+
+    public function reopen(Job $job)
+    {
+        $job->update(['is_finalized' => false, 'is_draft' => true]);
+        $this->logJobAction($job, 'reopened');
+        return redirect()->route('jobs.index')
+        ->with('flash', 
+        [
+            'type' => 'success',
+            'message' => 'Job reopened successfully.'
+        ]);
+    }
+
+    private function logJobAction($job, $action, $details = null)
+    {
+        JobLog::create([
+            'job_id' => $job->id,
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'details' => $details,
         ]);
     }
 

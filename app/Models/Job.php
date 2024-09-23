@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Carbon\Carbon;
 class Job extends Model
 {
     use HasFactory, SoftDeletes;
@@ -16,7 +16,7 @@ class Job extends Model
         'vehicle_in', 'vehicle_out', 'bags_cartons', 'pallets',
         'labour_contractor_id', 'labors_count', 'labor_start_time',
         'labor_end_time', 'lifter_contractor_id', 'lifter_start_time', 'lifter_end_time',
-        'is_draft','user_id'
+        'is_draft','user_id', 'is_finalized'
     ];
 
     protected $casts = [
@@ -28,6 +28,7 @@ class Job extends Model
         'lifter_start_time' => 'datetime',
         'lifter_end_time' => 'datetime',
         'is_draft' => 'boolean',
+        'is_finalized' => 'boolean',
     ];
 
     // Relationships
@@ -50,4 +51,40 @@ class Job extends Model
     {
         return $this->belongsTo(Staff::class, 'lifter_contractor_id');
     }
+   // Add accessor for vehicle_in
+    public function getVehicleInAttribute($value)
+    {
+        return Carbon::parse($value)->format('h:i A');
+    }
+
+    // Add accessor for vehicle_out
+    public function getVehicleOutAttribute($value)
+    {
+        return Carbon::parse($value)->format('h:i A');
+    }
+
+    // Add accessor for labor_start_time
+    public function getLaborStartTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('h:i A');
+    }
+
+    // Add accessor for labor_end_time
+    public function getLaborEndTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('h:i A');
+    }
+
+    // Add accessor for lifter_start_time
+    public function getLifterStartTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('h:i A');
+    }
+
+    // Add accessor for lifter_end_time
+    public function getLifterEndTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('h:i A');
+    }
+
 }

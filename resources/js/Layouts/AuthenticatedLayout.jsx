@@ -5,6 +5,7 @@ import { usePage } from '@inertiajs/react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
 const AuthenticatedLayout = ({ children }) => {
   const { auth } = usePage().props;
 

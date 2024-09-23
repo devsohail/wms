@@ -7,6 +7,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { showSuccessToast, showErrorToast } from '@/Utils/toast';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) => {
   const { data, setData, put, processing, errors } = useForm({
@@ -61,10 +63,20 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
   const handleStorageChange = (event) => {
     setData('storage_type', event.target.value);
   };
-
   const handleTimeChange = (field, value) => {
     setData(field, value ? dayjs(value).format('HH:mm') : null);
   };
+
+  const [showVehicleTimes, setShowVehicleTimes] = useState(!!data.vehicle_id);
+
+  useEffect(() => {
+    if (flash?.error) {
+      showErrorToast(flash.error);
+    }
+    setShowVehicleTimes(!!data.vehicle_id);
+  }, [data.vehicle_id]);
+
+
 
   return (
     <AuthenticatedLayout>
@@ -139,19 +151,61 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
                   labelId="vehicle-select-label"
                   id="vehicle-select"
                   value={data.vehicle_id}
-                  onChange={(e) => setData('vehicle_id', e.target.value)}
+                  onChange={(e) => {
+                    setData('vehicle_id', e.target.value);
+                    setShowVehicleTimes(!!e.target.value);
+                  }}
                   label="Vehicle"
                 >
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
                   {vehicles.map(vehicle => (
-                    <MenuItem key={vehicle.id} value={vehicle.id}>{vehicle.license_plate}</MenuItem>
+                    <MenuItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.license_plate}
+                    </MenuItem>
                   ))}
                 </Select>
                 {errors.vehicle_id && <FormHelperText>{errors.vehicle_id}</FormHelperText>}
               </FormControl>
             </Grid>
+
+            {showVehicleTimes && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Vehicle In"
+                    value={data.vehicle_in ? dayjs(data.vehicle_in, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('vehicle_in', time)}
+                    ampm={false}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.vehicle_in}
+                        helperText={errors.vehicle_in}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TimePicker
+                    label="Vehicle Out"
+                    value={data.vehicle_out ? dayjs(data.vehicle_out, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('vehicle_out', time)}
+                    ampm={false}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.vehicle_out}
+                        helperText={errors.vehicle_out}
+                      />
+                    )}
+                  />
+                </Grid>
+              </>
+            )}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -181,44 +235,6 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Supervisor Sign"
-                value={data.supervisor_sign}
-                onChange={e => setData('supervisor_sign', e.target.value)}
-                error={!!errors.supervisor_sign}
-                helperText={errors.supervisor_sign}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TimePicker
-                label="Vehicle In"
-                value={data.vehicle_in}
-                onChange={(time) => handleTimeChange('vehicle_in', time)}
-                renderInput={(params) => <TextField {...params} fullWidth error={!!errors.vehicle_in} helperText={errors.vehicle_in} />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TimePicker
-                label="Vehicle Out"
-                value={data.vehicle_out}
-                onChange={(time) => handleTimeChange('vehicle_out', time)}
-                renderInput={(params) => <TextField {...params} fullWidth error={!!errors.vehicle_out} helperText={errors.vehicle_out} />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Bags/Cartons"
-                type="number"
-                inputProps={{ min: 0 }}
-                value={data.bags_cartons}
-                onChange={e => setData('bags_cartons', e.target.value)}
-                error={!!errors.bags_cartons}
-                helperText={errors.bags_cartons}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
                 label="Pallets"
                 type="number"
                 inputProps={{ min: 0 }}
@@ -230,46 +246,37 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth error={!!errors.labour_contractor_id}>
-                <InputLabel>Labor Contractor</InputLabel>
+                <InputLabel id="labour-contractor-select-label">Labour Contractor</InputLabel>
                 <Select
+                  labelId="labour-contractor-select-label"
+                  id="labour-contractor-select"
                   value={data.labour_contractor_id}
-                  onChange={e => setData('labour_contractor_id', e.target.value)}
-                  label="Labor Contractor"
+                  onChange={(e) => {
+                    setData('labour_contractor_id', e.target.value);
+                    setShowLaborTimes(!!e.target.value);
+                  }}
+                  label="Labour Contractor"
                 >
-                  <MenuItem value="">None</MenuItem>
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
                   {laborContractors.map(contractor => (
                     <MenuItem key={contractor.id} value={contractor.id}>{contractor.name}</MenuItem>
                   ))}
                 </Select>
+                {errors.labour_contractor_id && <FormHelperText>{errors.labour_contractor_id}</FormHelperText>}
               </FormControl>
             </Grid>
+
             {showLaborTimes && (
               <>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="# of Labors"
-                    type="number"
-                    inputProps={{ min: 0 }}
-                    value={data.labors_count}
-                    onChange={e => setData('labors_count', e.target.value)}
-                    error={!!errors.labors_count}
-                    helperText={errors.labors_count}
-                  />
-                </Grid>
                 <Grid item xs={12} sm={6}>
                   <TimePicker
                     label="Labor Start Time"
                     value={data.labor_start_time ? dayjs(data.labor_start_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('labor_start_time', time)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={!!errors.labor_start_time}
-                        helperText={errors.labor_start_time}
-                      />
-                    )}
+                    ampm={false}
+                    renderInput={(params) => <TextField {...params} fullWidth error={!!errors.labor_start_time} helperText={errors.labor_start_time} />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -277,33 +284,49 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
                     label="Labor End Time"
                     value={data.labor_end_time ? dayjs(data.labor_end_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('labor_end_time', time)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={!!errors.labor_end_time}
-                        helperText={errors.labor_end_time}
-                      />
-                    )}
+                    ampm={false}
+                    renderInput={(params) => <TextField {...params} fullWidth error={!!errors.labor_end_time} helperText={errors.labor_end_time} />}
                   />
                 </Grid>
               </>
             )}
             <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Labors Count"
+                type="number"
+                inputProps={{ min: 0 }}
+                value={data.labors_count}
+                onChange={e => setData('labors_count', e.target.value)}
+                error={!!errors.labors_count}
+                helperText={errors.labors_count}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
               <FormControl fullWidth error={!!errors.lifter_contractor_id}>
-                <InputLabel>Lifter</InputLabel>
+                <InputLabel id="lifter-contractor-select-label">Lifter Contractor</InputLabel>
                 <Select
+                  labelId="lifter-contractor-select-label"
+                  id="lifter-contractor-select"
                   value={data.lifter_contractor_id}
-                  onChange={e => setData('lifter_contractor_id', e.target.value)}
-                  label="Lifter"
+                  onChange={(e) => {
+                    setData('lifter_contractor_id', e.target.value);
+                    setShowLifterTimes(!!e.target.value);
+                  }}
+                  label="Lifter Contractor"
                 >
-                  <MenuItem value="">None</MenuItem>
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
                   {lifters.map(lifter => (
                     <MenuItem key={lifter.id} value={lifter.id}>{lifter.name}</MenuItem>
                   ))}
                 </Select>
+                {errors.lifter_contractor_id && <FormHelperText>{errors.lifter_contractor_id}</FormHelperText>}
               </FormControl>
             </Grid>
+
             {showLifterTimes && (
               <>
                 <Grid item xs={12} sm={6}>
@@ -311,14 +334,8 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
                     label="Lifter Start Time"
                     value={data.lifter_start_time ? dayjs(data.lifter_start_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('lifter_start_time', time)}
-                    renderInput={(params) => 
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={!!errors.lifter_start_time}
-                        helperText={errors.lifter_start_time}
-                    />
-                  }
+                    ampm={false}
+                    renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_start_time} helperText={errors.lifter_start_time} />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -326,6 +343,7 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
                     label="Lifter End Time"
                     value={data.lifter_end_time ? dayjs(data.lifter_end_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('lifter_end_time', time)}
+                    ampm={false}
                     renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_end_time} helperText={errors.lifter_end_time} />}
                   />
                 </Grid>
@@ -337,20 +355,20 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
                   <Checkbox
                     checked={data.is_draft}
                     onChange={(e) => setData('is_draft', e.target.checked)}
-                    name="is_draft"
                   />
                 }
                 label="Save as Draft"
               />
             </Grid>
           </Grid>
+
           <Box sx={{ mt: 2 }}>
             <Button type="submit" variant="contained" color="primary" disabled={processing}>
-              {data.is_draft ? 'Save Draft' : 'Update Job'}
+              {processing ? 'Saving...' : 'Save Job'}
             </Button>
-            <Link href={route('jobs.index')}>
-              <Button variant="outlined" sx={{ ml: 2 }}>Cancel</Button>
-            </Link>
+            <Button component={Link} href={route('jobs.index')} variant="outlined" sx={{ ml: 2 }}>
+              Cancel
+            </Button>
           </Box>
         </Box>
       </LocalizationProvider>
