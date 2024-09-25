@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box } from '@mui/material';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { showSuccessToast, showErrorToast } from '@/Utils/toast';
 
 const Index = ({ documents, auth,flash }) => {
+    const { delete: destroy } = useForm();
     useEffect(() => {
         if (flash && flash.type === 'success') {
           showSuccessToast(flash.message);
@@ -13,8 +14,8 @@ const Index = ({ documents, auth,flash }) => {
         }
       }, [flash]);
       const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this customer?')) {
-          destroy(route('customers.destroy', id));
+        if (confirm('Are you sure you want to delete this document?')) {
+            destroy(route('documents.destroy', id));
         }
       };
   return (
@@ -47,14 +48,24 @@ const Index = ({ documents, auth,flash }) => {
                     <a href={route('documents.download', document.id)} download>
                         <Button variant="outlined" color="primary" sx={{ mr: 1 }}>Download</Button>
                     </a>
-                  {auth.user.role_id === 1 && (
+                  {document.user.role_id === 1 && (
                     <>
-                      <Link href={route('documents.edit', document.id)}>
-                        <Button variant="outlined" color="secondary" sx={{ mr: 1 }}>Edit</Button>
-                      </Link>
-                      <Link href={route('documents.destroy', document.id)} method="delete" as="button" onClick={() => handleDelete(document.id)}>
-                        <Button variant="outlined" color="error">Delete</Button>
-                      </Link>
+                     <Button 
+                        variant="outlined" 
+                        color="secondary" 
+                        onClick={() => handleEdit(document.id)}
+                        sx={{ mr: 1 }}
+                      >
+                        Edit
+                      </Button>
+
+                      <Button 
+                        variant="outlined" 
+                        color="error" 
+                        onClick={() => handleDelete(document.id)}
+                      >
+                        Delete
+                      </Button>
                     </>
                   )}
                 </TableCell>
