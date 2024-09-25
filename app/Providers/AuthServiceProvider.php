@@ -8,6 +8,8 @@ use App\Models\Customer;
 use App\Policies\CustomerPolicy;
 use App\Models\Staff;
 use App\Policies\StaffPolicy;
+use App\Models\Document;
+use App\Policies\DocumentPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,7 +20,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Customer::class => CustomerPolicy::class,
-        Staff::class => StaffPolicy::class
+        Staff::class => StaffPolicy::class,
+        Document::class => DocumentPolicy::class,
     ];
 
     /**

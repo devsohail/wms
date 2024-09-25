@@ -43,7 +43,7 @@ const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
     }
     if (flash?.error) {
       showErrorToast(flash.error);
-    }
+    } 
     setShowLaborTimes(!!data.labour_contractor_id);
     setShowLifterTimes(!!data.lifter_contractor_id);
   }, [flash, data.labour_contractor_id, data.lifter_contractor_id]);
@@ -219,16 +219,18 @@ const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
             <Grid item xs={12} sm={6}>
               <TimePicker
                 label="Vehicle In"
-                value={data.vehicle_in}
-                onChange={(time) => setData('vehicle_in', time)}
+                value={data.vehicle_in ? dayjs(data.vehicle_in, 'HH:mm') : null}
+                onChange={(time) => handleTimeChange('vehicle_in', time)}
+                ampm={false}
                 renderInput={(params) => <TextField {...params} fullWidth error={!!errors.vehicle_in} helperText={errors.vehicle_in} />}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TimePicker
                 label="Vehicle Out"
-                value={data.vehicle_out}
-                onChange={(time) => setData('vehicle_out', time)}
+                value={data.vehicle_out ? dayjs(data.vehicle_out, 'HH:mm') : null}
+                onChange={(time) => handleTimeChange('vehicle_out', time)}
+                ampm={false}
                 renderInput={(params) => <TextField {...params} fullWidth error={!!errors.vehicle_out} helperText={errors.vehicle_out} />}
               />
             </Grid>
@@ -290,6 +292,7 @@ const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
                     label="Labor Start Time"
                     value={data.labor_start_time ? dayjs(data.labor_start_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('labor_start_time', time)}
+                    ampm={false}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -305,6 +308,7 @@ const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
                     label="Labor End Time"
                     value={data.labor_end_time ? dayjs(data.labor_end_time, 'HH:mm') : null}
                     onChange={(time) => handleTimeChange('labor_end_time', time)}
+                    ampm={false}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -337,16 +341,18 @@ const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
                 <Grid item xs={12} sm={6}>
                   <TimePicker
                     label="Lifter Start Time"
-                    value={data.lifter_start_time}
-                    onChange={(time) => setData('lifter_start_time', time)}
+                    value={data.lifter_start_time ? dayjs(data.lifter_start_time, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('lifter_start_time', time)}
+                    ampm={false}
                     renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_start_time} helperText={errors.lifter_start_time} />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TimePicker
                     label="Lifter End Time"
-                    value={data.lifter_end_time}
-                    onChange={(time) => setData('lifter_end_time', time)}
+                    value={data.lifter_end_time ? dayjs(data.lifter_end_time, 'HH:mm') : null}
+                    onChange={(time) => handleTimeChange('lifter_end_time', time)}
+                    ampm={false}
                     renderInput={(params) => <TextField {...params} fullWidth error={!!errors.lifter_end_time} helperText={errors.lifter_end_time} />}
                   />
                 </Grid>

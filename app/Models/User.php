@@ -70,4 +70,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Customer::class);
     }
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }
