@@ -133,17 +133,11 @@ class JobController extends Controller
             'weight_slip_no' => 'nullable|string|max:255',
             'storage_type' => ['required', Rule::in(['in', 'out'])],
             'supervisor_sign' => 'nullable|string|max:255',
-            'vehicle_in' => 'nullable|date_format:H:i',
-            'vehicle_out' => 'nullable|date_format:H:i',
             'bags_cartons' => 'nullable|integer|min:0',
             'pallets' => 'nullable|integer|min:0',
             'labor_contractor_id' => 'nullable|exists:staff,id',
             'labors_count' => 'nullable|integer|min:0',
-            'labor_start_time' => 'nullable|date_format:H:i',
-            'labor_end_time' => 'nullable|date_format:H:i',
             'lifter_id' => 'nullable|exists:staff,id',
-            'lifter_start_time' => 'nullable|date_format:H:i',
-            'lifter_end_time' => 'nullable|date_format:H:i',
             'is_draft' => 'boolean',
         ]);
 

@@ -127,9 +127,9 @@ const Create = ({ customers, vehicles, laborContractors, lifters, flash }) => {
                 fullWidth
                 label="Job Number"
                 value={data.job_number}
-                InputProps={{
-                  readOnly: true,
-                }}
+                onChange={(e) => setData('job_number', e.target.value)}
+                error={!!errors.job_number}
+                helperText={errors.job_number}
               />
             </Grid>
             <Grid item xs={12} sm={6}>

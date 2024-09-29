@@ -102,7 +102,6 @@ const Index = ({ jobs, flash }) => {
               <TableCell>Date</TableCell>
               <TableCell>Client Name</TableCell>
               <TableCell>Vehicle</TableCell>
-              <TableCell>Job Nature</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -119,7 +118,6 @@ const Index = ({ jobs, flash }) => {
                     : 'No Vehicle'
                   }
                 </TableCell>
-                <TableCell>{job.job_nature || 'N/A'}</TableCell>
                 <TableCell>{job.is_finalized ? 'Finalized' : (job.is_draft ? 'Draft' : 'In Draft')}</TableCell>
                 <TableCell>
                   {job.is_draft && (
@@ -137,7 +135,7 @@ const Index = ({ jobs, flash }) => {
                       Finalize
                     </Button>
                   )}
-                  {job.is_finalized && (
+                  {/* {job.is_finalized && (
                     <Button 
                       variant="outlined" 
                       color="warning" 
@@ -146,7 +144,7 @@ const Index = ({ jobs, flash }) => {
                     >
                       Re-open
                     </Button>
-                  )}
+                  )} */}
                   <Button 
                     variant="outlined" 
                     color="info" 

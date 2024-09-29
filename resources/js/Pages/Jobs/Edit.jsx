@@ -21,17 +21,17 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
     weight_slip_no: job.weight_slip_no || '',
     storage_type: job.storage_type || '',
     supervisor_sign: job.supervisor_sign || '',
-    vehicle_in: job.vehicle_in || null,
-    vehicle_out: job.vehicle_out || null,
+    vehicle_in: job.vehicle_in || '',
+    vehicle_out: job.vehicle_out || '',
     bags_cartons: job.bags_cartons || '',
     pallets: job.pallets || '',
     labour_contractor_id: job.labour_contractor_id || '',
     labors_count: job.labors_count || '',
-    labor_start_time: job.labor_start_time || null,
-    labor_end_time: job.labor_end_time || null,
+    labor_start_time: job.labor_start_time || '',
+    labor_end_time: job.labor_end_time || '',
     lifter_contractor_id: job.lifter_contractor_id || '',
-    lifter_start_time: job.lifter_start_time || null,
-    lifter_end_time: job.lifter_end_time || null,
+    lifter_start_time: job.lifter_start_time || '',
+    lifter_end_time: job.lifter_end_time || '',
     is_draft: job.is_draft || false,
   });
 
@@ -111,9 +111,9 @@ const Edit = ({ job, customers, vehicles, laborContractors, lifters, flash }) =>
                 fullWidth
                 label="Job Number"
                 value={data.job_number}
-                InputProps={{
-                  readOnly: true,
-                }}
+                onChange={(e) => setData('job_number', e.target.value)}
+                error={!!errors.job_number}
+                helperText={errors.job_number}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
